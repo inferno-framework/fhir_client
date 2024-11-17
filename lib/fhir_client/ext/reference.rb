@@ -82,7 +82,7 @@ module FHIR
     include FHIR::ReferenceExtras
 
     def resource_class
-      FHIR.const_get(resource_type) unless contained?
+      FHIR.const_get(resource_type) unless contained? || resource_type.nil?
     end
   end
 end
@@ -101,7 +101,7 @@ end
 
 module FHIR
   module STU3
-    class Reference 
+    class Reference
       include FHIR::ReferenceExtras
 
       def resource_class

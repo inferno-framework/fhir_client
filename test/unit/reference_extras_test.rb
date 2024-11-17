@@ -62,6 +62,11 @@ class ReferencesExtrasTest < Test::Unit::TestCase
     assert r.resource_class == FHIR::DSTU2::Patient
   end
 
+  def test_reference_klass_empty
+    r = FHIR::Reference.new({'display': 'abc'})
+    assert r.resource_class.nil?
+  end
+
   def test_relative
     r = FHIR::Reference.new({'reference': 'Patient/foo'})
     assert r.relative?
