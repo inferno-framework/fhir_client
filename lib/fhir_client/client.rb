@@ -40,7 +40,7 @@ module FHIR
     #
     def initialize(base_service_url, default_format: FHIR::Formats::ResourceFormat::RESOURCE_JSON, proxy: nil)
       @base_service_url = base_service_url
-      FHIR.logger.info "Initializing client with #{@base_service_url}"
+      FHIR.logger.debug "Initializing client with #{@base_service_url}"
       @use_format_param = false
       @use_accept_header = true
       @use_accept_charset = true
@@ -104,13 +104,13 @@ module FHIR
       end
       # Should update the default_format when changing fhir_version
       @default_format = versioned_format_class
-      FHIR.logger.info("Detecting server FHIR version as #{@fhir_version} via metadata")
+      FHIR.logger.debug("Detecting server FHIR version as #{@fhir_version} via metadata")
       @fhir_version
     end
 
     # Set the client to use no authentication mechanisms
     def set_no_auth
-      FHIR.logger.info 'Configuring the client to use no authentication.'
+      FHIR.logger.debug 'Configuring the client to use no authentication.'
       @use_oauth2_auth = false
       @use_basic_auth = false
       @security_headers = {}
@@ -121,7 +121,7 @@ module FHIR
 
     # Set the client to use HTTP Basic Authentication
     def set_basic_auth(client, secret)
-      FHIR.logger.info 'Configuring the client to use HTTP Basic authentication.'
+      FHIR.logger.debug 'Configuring the client to use HTTP Basic authentication.'
       token = Base64.encode64("#{client}:#{secret}")
       value = "Basic #{token}"
       @security_headers = { 'Authorization' => value }
@@ -134,7 +134,7 @@ module FHIR
 
     # Set the client to use Bearer Token Authentication
     def set_bearer_token(token)
-      FHIR.logger.info 'Configuring the client to use Bearer Token authentication.'
+      FHIR.logger.debug 'Configuring the client to use Bearer Token authentication.'
       value = "Bearer #{token}"
       @security_headers = { 'Authorization' => value }
       @use_oauth2_auth = false
@@ -150,7 +150,7 @@ module FHIR
     # authorize_path -- absolute path of authorization endpoint
     # token_path -- absolute path of token endpoint
     def set_oauth2_auth(client, secret, authorize_path, token_path, site = nil)
-      FHIR.logger.info 'Configuring the client to use OpenID Connect OAuth2 authentication.'
+      FHIR.logger.debug 'Configuring the client to use OpenID Connect OAuth2 authentication.'
       @use_oauth2_auth = true
       @use_basic_auth = false
       @security_headers = {}
@@ -441,7 +441,7 @@ module FHIR
 
     def get(path, headers = {})
       url = Addressable::URI.parse(build_url(path)).to_s
-      FHIR.logger.info "GETTING: #{url}"
+      FHIR.logger.debug "GETTING: #{url}"
       headers = clean_headers(headers) unless headers.empty?
       if @use_oauth2_auth
         # @client.refresh!
@@ -522,7 +522,7 @@ module FHIR
 
     def post(path, resource, headers)
       url = URI(build_url(path)).to_s
-      FHIR.logger.info "POSTING: #{url}"
+      FHIR.logger.debug "POSTING: #{url}"
       headers = clean_headers(headers)
       payload = request_payload(resource, headers) if resource
       if @use_oauth2_auth
@@ -569,7 +569,7 @@ module FHIR
 
     def put(path, resource, headers)
       url = URI(build_url(path)).to_s
-      FHIR.logger.info "PUTTING: #{url}"
+      FHIR.logger.debug "PUTTING: #{url}"
       headers = clean_headers(headers)
       payload = request_payload(resource, headers) if resource
       if @use_oauth2_auth
@@ -616,7 +616,7 @@ module FHIR
 
     def patch(path, patchset, headers)
       url = URI(build_url(path)).to_s
-      FHIR.logger.info "PATCHING: #{url}"
+      FHIR.logger.debug "PATCHING: #{url}"
       headers = clean_headers(headers)
       payload = request_patch_payload(patchset, headers['Content-Type'])
       if @use_oauth2_auth
@@ -685,7 +685,7 @@ module FHIR
 
     def delete(path, headers)
       url = URI(build_url(path)).to_s
-      FHIR.logger.info "DELETING: #{url}"
+      FHIR.logger.debug "DELETING: #{url}"
       headers = clean_headers(headers)
       if @use_oauth2_auth
         # @client.refresh!
@@ -732,7 +732,7 @@ module FHIR
     def head(path, headers)
       headers.merge!(@security_headers) unless @security_headers.blank?
       url = URI(build_url(path)).to_s
-      FHIR.logger.info "HEADING: #{url}"
+      FHIR.logger.debug "HEADING: #{url}"
       RestClient.head(url, headers) do |response, request, result|
         FHIR.logger.debug "HEAD - Request: #{request.to_json}, Response: #{response.force_encoding('UTF-8')}"
         request.args[:path] = url.gsub(@base_service_url, '')
