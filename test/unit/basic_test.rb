@@ -52,6 +52,17 @@ class BasicTest < Test::Unit::TestCase
     assert client.client.client.site == "http://custom-test.com/fhir/"
   end
 
+  def test_oauth2_auth_with_proxy
+    stub_request(:post, /token_path/).to_return(status: 200, body: '{"access_token" : "valid_token"}', headers: {'Content-Type' => 'application/json'})
+
+    proxy_client = FHIR::Client.new("http://basic-test.com/fhir/", proxy: "http://proxy.example.com:8080")
+    proxy_client.set_oauth2_auth("client", "secret", "authorize_path", "token_path")
+
+    assert proxy_client.use_oauth2_auth
+    oauth2_client = proxy_client.client.client
+    assert_equal({ proxy: "http://proxy.example.com:8080" }, oauth2_client.options[:connection_opts])
+  end
+
   def test_client_logs_without_response
     # This used to provide a NoMethodError:
     # undefined method `request' for nil:NilClass
