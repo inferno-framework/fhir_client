@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'fhir_dstu2_models', '>= 1.1.1'
   spec.add_dependency 'nokogiri', '>= 1.19.1'
   spec.add_dependency 'oauth2', '~> 2.0'
-  spec.add_dependency 'rack', '>= 3.2.6'
+  spec.add_dependency 'rack', '>= 2.0'
   spec.add_dependency 'rest-client', '~> 2.0'
   spec.add_dependency 'tilt', '>= 1.1'
 
