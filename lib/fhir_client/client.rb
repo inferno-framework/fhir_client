@@ -487,7 +487,7 @@ module FHIR
       FHIR.logger.info "GETTING: #{url}"
       headers = clean_headers(headers) unless headers.empty?
       if @use_oauth2_auth
-        # @client.refresh!
+        refresh_oauth2_session
         begin
           response = @client.get(url, headers: headers)
         rescue => e
@@ -569,7 +569,7 @@ module FHIR
       headers = clean_headers(headers)
       payload = request_payload(resource, headers) if resource
       if @use_oauth2_auth
-        # @client.refresh!
+        refresh_oauth2_session
         begin
           response = @client.post(url, headers: headers, body: payload)
         rescue => e
@@ -616,7 +616,7 @@ module FHIR
       headers = clean_headers(headers)
       payload = request_payload(resource, headers) if resource
       if @use_oauth2_auth
-        # @client.refresh!
+        refresh_oauth2_session
         begin
           response = @client.put(url, headers: headers, body: payload)
         rescue => e
@@ -663,7 +663,7 @@ module FHIR
       headers = clean_headers(headers)
       payload = request_patch_payload(patchset, headers['Content-Type'])
       if @use_oauth2_auth
-        # @client.refresh!
+        refresh_oauth2_session
         begin
           response = @client.patch(url, headers: headers, body: payload)
         rescue => e
@@ -731,7 +731,7 @@ module FHIR
       FHIR.logger.info "DELETING: #{url}"
       headers = clean_headers(headers)
       if @use_oauth2_auth
-        # @client.refresh!
+        refresh_oauth2_session
         begin
           response = @client.delete(url, headers: headers)
         rescue => e
@@ -794,6 +794,11 @@ module FHIR
       else
         "#{base_path(path)}#{path}"
       end
+    end
+
+    def refresh_oauth2_session
+      return unless @use_oauth2_auth
+      @client = @client.refresh! if (@client.expired? && @client.refresh_token)
     end
   end
 end
